@@ -171,3 +171,26 @@ WHERE
    		 FROM loan l, account a
    		 WHERE l.account_id = a.account_id and l.status = 'A'
    	 )
+
+-- COMMAND ----------
+
+SELECT
+    L.account_id AS account_id,
+    C.client_id AS client_id,
+    C.birth_number AS birth_number,
+    C.district_id AS district_id,
+    L.amount AS loan_amount,
+    L.duration AS loan_duration,
+    L.payments AS loan_payments,
+    L.status AS loan_status,
+    CASE
+        WHEN L.status IN ('A', 'C') THEN 0  -- Cliente en buen estado de pago
+        WHEN L.status IN ('B', 'D') THEN 1  -- Cliente en incumplimiento de pago
+        ELSE NULL  -- Otros estados
+    END AS loan_default
+FROM
+    Loan L
+INNER JOIN
+    disp D ON L.account_id = D.account_id
+INNER JOIN
+    client C ON D.client_id = C.client_id;
